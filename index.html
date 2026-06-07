@@ -1,1 +1,463 @@
-placeholder
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NHN Group 中途採用ポジション一覧</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #F7F6F3;
+  --surface: #FFFFFF;
+  --border: #E4E2DC;
+  --border-strong: #C8C4BB;
+  --text: #1A1916;
+  --text-muted: #6B6860;
+  --text-faint: #A8A59F;
+
+  --pa: #1B4F8A;   --pa-bg: #EBF2FB;
+  --tc: #0D5C45;   --tc-bg: #E4F5EF;
+  --jp: #4B3296;   --jp-bg: #EEEAFB;
+  --fk: #8B2A12;   --fk-bg: #FBECE6;
+  --cl: #255C1A;   --cl-bg: #E8F5E2;
+
+  --tech-c: #1555A0; --tech-bg: #E8F0FA;
+  --biz-c:  #2B6B28; --biz-bg:  #E8F5E4;
+  --corp-c: #4B3296; --corp-bg: #EEEAFB;
+  --des-c:  #8B2563; --des-bg:  #FAEBF3;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page-header {
+  background: var(--text);
+  color: #fff;
+  padding: 28px 40px 28px;
+}
+.page-header h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+.header-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
+.header-apply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: none;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 12px 28px;
+  border-radius: 8px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.22);
+  letter-spacing: 0.1px;
+}
+.header-apply-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 40px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.toolbar select, .toolbar input[type=text] {
+  font-family: inherit;
+  font-size: 13px;
+  padding: 7px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  height: 36px;
+  cursor: pointer;
+}
+.toolbar input[type=text] { width: 260px; }
+.toolbar select:focus, .toolbar input:focus {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+}
+.result-count {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: 'DM Mono', monospace;
+}
+
+.main { padding: 32px 40px 60px; }
+
+.corp-section { margin-bottom: 40px; }
+.corp-section:last-child { margin-bottom: 0; }
+
+.corp-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--text);
+}
+.corp-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.corp-title { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; }
+.corp-count {
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  color: var(--text-muted);
+  margin-left: auto;
+}
+
+.tbl-wrap {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--surface);
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+col.c-grp { width: 78px; }
+col.c-pos { width: 180px; }
+col.c-emp { width: 70px; }
+col.c-req { width: auto; }
+
+thead th {
+  background: #F0EEE9;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #FAFAF8; }
+td { padding: 10px 12px; vertical-align: top; }
+
+.badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 20px;
+  white-space: nowrap;
+  line-height: 1.6;
+}
+.b-tech { background: var(--tech-bg); color: var(--tech-c); }
+.b-biz  { background: var(--biz-bg);  color: var(--biz-c); }
+.b-corp { background: var(--corp-bg); color: var(--corp-c); }
+.b-des  { background: var(--des-bg);  color: var(--des-c); }
+.b-etc  { background: #F0EEE9; color: var(--text-muted); }
+
+.b-seiin  { background: #F0EEE9; color: var(--text-muted); }
+.b-keiyak { background: var(--fk-bg); color: var(--fk); }
+.b-jun    { background: #FAEEDA; color: #7A4A08; }
+
+.pos-name {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+.pos-name a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s;
+}
+.pos-name a:hover { border-color: var(--text); }
+.pos-series { font-size: 10.5px; color: var(--text-faint); margin-top: 2px; word-break: keep-all; }
+
+.req-text { font-size: 11.5px; color: var(--text-muted); line-height: 1.7; word-break: keep-all; overflow-wrap: break-word; }
+.req-text ul { margin: 0; padding-left: 14px; }
+.req-text li { margin-bottom: 1px; }
+.req-none { font-size: 11px; color: var(--text-faint); }
+
+col.c-detail { width: 100px; }
+.detail-cell { text-align: center; vertical-align: middle; padding: 10px 18px; }
+.btn-detail {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  padding: 4px 10px;
+  border-radius: 5px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.12s, border-color 0.12s;
+}
+.btn-detail:hover { background: var(--border); border-color: var(--text-muted); }
+.btn-detail-none { font-size: 11px; color: var(--text-faint); }
+.btn-detail-private { font-size: 10px; color: var(--text-faint); white-space: nowrap; }
+
+.hidden { display: none !important; }
+.section-hidden { display: none !important; }
+
+.no-result { text-align: center; padding: 60px 20px; color: var(--text-faint); font-size: 13px; }
+
+@media print {
+  .toolbar { display: none; }
+  .page-header { padding: 16px 24px; }
+  .main { padding: 20px 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>NHN 中途採用ポジション一覧</h1>
+  <p class="header-desc">NHN各社で募集中のポジションを掲載しています。<br>下記のフォームよりご応募ください。</p>
+  <a class="header-apply-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSfYVbB15q14TGlcZLCF_0TnJKB1kMd4VtZYFCw-8cMBj44f7w/viewform" target="_blank" rel="noopener">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    応募フォームを開く
+  </a>
+</div>
+
+<div class="toolbar">
+  <select id="fCorp">
+    <option value="">会社 全て</option>
+    <option value="JAPAN">NHN JAPAN</option>
+    <option value="PlayArt">NHN PlayArt</option>
+    <option value="Fukuoka">NHN Fukuoka</option>
+    <option value="Cloud">NHN Cloud Japan</option>
+    <option value="Techorus">NHN Techorus</option>
+  </select>
+  <select id="fGrp">
+    <option value="">職種 全て</option>
+    <option value="Tech">Tech</option>
+    <option value="Business">Business</option>
+    <option value="Corporate">Corporate</option>
+    <option value="Design">Design</option>
+  </select>
+  <select id="fEmp">
+    <option value="">雇用形態 全て</option>
+    <option value="正社員">正社員</option>
+    <option value="契約社員">契約社員</option>
+    <option value="準社員">準社員</option>
+  </select>
+  <input type="text" id="fKw" placeholder="検索（ポジション名・要件…）">
+  <span class="result-count" id="cnt"></span>
+</div>
+
+<div class="main" id="main"></div>
+<div class="no-result hidden" id="noResult">該当するポジションがありません。</div>
+
+<script>
+const CORPS = [
+  { id: "JAPAN",    label: "NHN JAPAN",       dot: "#4B3296" },
+  { id: "PlayArt",  label: "NHN PlayArt",      dot: "#1B4F8A" },
+  { id: "Fukuoka",  label: "NHN Fukuoka",      dot: "#8B2A12" },
+  { id: "Cloud",    label: "NHN Cloud Japan",  dot: "#255C1A" },
+  { id: "Techorus", label: "NHN Techorus",     dot: "#0D5C45" },
+];
+
+const DATA = [
+  // ── NHN PlayArt ──
+  {corp:"PlayArt",grp:"Business",nm:"事業戦略担当",sr:"Business 共通",emp:"正社員",req:["モバイルゲーム市場に関する知識・関心","市場データ・競合データの収集・整理・分析ができる","分析結果を経営層向けにわかりやすく資料化できる","市場トレンド・競合動向を継続的にキャッチアップできる","データをもとに課題を整理し示唆を導き出せる（ロジカルシンキング）","社外パートナー・関係者との交渉・折衝ができる"],url:"https://recruit.nhn-japan.com/recruits/playart/4322846771576599206"},
+  {corp:"PlayArt",grp:"Design",nm:"3Dモーションデザイナー",sr:"デザイン",emp:"正社員",req:["ゲーム開発における3Dモーション制作の実務経験3年以上","手付モーションの制作経験","モーションキャプチャを用いたモーション制作経験","ポートフォリオの提出必須"],url:"https://recruit.nhn-japan.com/recruits/playart/4309789747037328336"},
+  {corp:"PlayArt",grp:"Business",nm:"ゲームデジタルマーケティング担当",sr:"マーケティング",emp:"正社員",req:["広告運用業務の経験（代理店・媒体での勤務経験歓迎）","マネタイズ（IAA）運用業務の経験","タイトルプロモーション企画の経験"],url:"https://recruit.nhn-japan.com/recruits/playart/4302556528303236337"},
+  {corp:"PlayArt",grp:"Design",nm:"UIデザイナー",sr:"デザイン",emp:"正社員",req:["UIデザイン実務経験3年以上","Photoshopを用いた実務経験3年以上","アイコン・バナー・ロゴ制作スキル","ポートフォリオの提出必須"],url:"https://recruit.nhn-japan.com/recruits/playart/4246627777271045762"},
+  {corp:"PlayArt",grp:"Business",nm:"ゲームディレクター候補",sr:"ゲームプランナー・ディレクター",emp:"正社員",req:["クリエイティブな発想力・ユーザーを楽しませるためのコツ・楽しさを伝える技術","1つのプロジェクトをまとめゲームを制作・運営したご経験","新規ゲームの企画・立ち上げ・リリース・運営まで一通りの経験"],url:"https://recruit.nhn-japan.com/recruits/playart/3813380785320088269"},
+  {corp:"PlayArt",grp:"Tech",nm:"ゲームプログラマ（クライアント）",sr:"ゲームプログラマー（クライアント）",emp:"正社員",req:["C++・C#・Java などの言語いずれかを用いたスマートフォンゲームをはじめ、ゲーム開発の経験"],url:"https://recruit.nhn-japan.com/recruits/playart/3813407784650823264"},
+  {corp:"PlayArt",grp:"Tech",nm:"ゲームプログラマ（クライアント／C++またはCocos2d-x）",sr:"ゲームプログラマー（クライアント）",emp:"正社員",req:["C++またはCocos2d-xを使用したゲーム開発の経験"],url:"https://recruit.nhn-japan.com/recruits/playart/3813409520591138070"},
+  {corp:"PlayArt",grp:"Tech",nm:"ゲームプログラマ（クライアント／リードプログラマ）",sr:"ゲームプログラマー（クライアント）",emp:"正社員",req:["Unity（C#）を使用したゲーム開発の経験5年以上"],url:"https://recruit.nhn-japan.com/recruits/playart/3813411594720468500"},
+  {corp:"PlayArt",grp:"Tech",nm:"ゲームプログラマ（サーバサイド）",sr:"ゲームプログラマー（サーバー）",emp:"正社員",req:["C++・Java・Kotlin・Go などの言語いずれかを用いたサーバー開発・運用経験","MySQL・Oracle・各種KVS などを用いた開発・運用経験"],url:"https://recruit.nhn-japan.com/recruits/playart/3813403170846598869"},
+  // ── NHN Fukuoka ──
+  {corp:"Fukuoka",grp:"Corporate",nm:"〔準社員〕翻訳業務",sr:"業務支援",emp:"準社員",req:["日本語ネイティブレベル、かつ韓国語能力試験（TOPIK）6級レベルの韓国語スキル","基本的なWord・Excelの使用が可能な方"],url:"https://recruit.nhn-japan.com/recruits/fukuoka/3815372524072829032"},
+  {corp:"Fukuoka",grp:"Corporate",nm:"〔準社員〕Photoshop画像編集",sr:"業務支援",emp:"準社員",req:["Photoshop・ペンタブレットの使用が可能な方（コマの入れ替え・吹き出し作成・擬音加工・写植・塗りつぶし等）","基本的なExcel操作が可能な方"],url:"https://recruit.nhn-japan.com/recruits/fukuoka/4285079852227267894"},
+  // ── NHN Cloud Japan ──
+  {corp:"Cloud",grp:"Business",nm:"ITソリューション営業",sr:"Business 共通",emp:"正社員",req:["クラウドまたはIT業界での営業経験5年以上","IT関連企業での勤務経験","社内外との円滑なコミュニケーション能力"],url:"https://recruit.nhn-japan.com/recruits/cloud/4204720346931199115"},
+  // ── NHN JAPAN ──
+  {corp:"JAPAN",grp:"Business",nm:"事業支援",sr:"Business 共通",emp:"契約社員",req:["エンタメ事業への関心がある方","新しい業務・未知の領域にも前向きに取り組める方","幅広い業務をマルチタスクで柔軟に対応できる方"],url:"https://recruit.nhn-japan.com/recruits/japan/4343111760668971731"},
+  {corp:"JAPAN",grp:"Tech",nm:"フロントエンドエンジニア",sr:"フロントエンド",emp:"契約社員",req:["HTML/CSS（Sass）・JavaScript（TypeScript）による開発経験（3年以上）","React・Vue・Svelte いずれかのフレームワーク使用経験","GitHub/GitLab などを使ったチーム開発経験","デザインツール（Figmaなど）をもとに忠実にUIを実装できるスキル","外部APIとの連携を考慮した実装の経験（REST/GraphQLなど）"],url:"https://recruit.nhn-japan.com/recruits/japan/4178634057492675482"},
+  {corp:"JAPAN",grp:"Corporate",nm:"情報セキュリティ担当",sr:"Corporate 共通",emp:"正社員",req:["ビジネス部門と円滑に対話できる方","個人情報保護法令に関する基礎知識を有する方","事業会社でのご経験（目安：2年以上）"],url:"https://recruit.nhn-japan.com/recruits/japan/4340010502868317887"},
+  {corp:"JAPAN",grp:"Corporate",nm:"不動産企画・開発",sr:"Corporate 共通",emp:"正社員",req:["事業収支計画・投資分析・融資交渉等に関する実務知識","建築士（1級・2級）の資格・知識"],url:"https://recruit.nhn-japan.com/recruits/japan/4337847568744530090"},
+  {corp:"JAPAN",grp:"Corporate",nm:"ホテル運営担当（支配人候補）",sr:"Corporate 共通",emp:"正社員",req:["ホテル・旅館での実務経験","PMS（プロパティマネジメントシステム）の操作経験","OTA管理経験（Booking.com・楽天トラベル等）"],url:"https://recruit.nhn-japan.com/recruits/japan/4337981047446522364"},
+  {corp:"JAPAN",grp:"Corporate",nm:"労務担当",sr:"人事・採用・労務",emp:"正社員",req:["人事労務業務の実務経験（目安5年以上）","就業規則・社内規程の整備・改廃の経験","労働・社会保険関連法令の基本知識"],url:"https://recruit.nhn-japan.com/recruits/japan/4331486752893154432"},
+  {corp:"JAPAN",grp:"Corporate",nm:"自社ビル管理担当",sr:"Corporate 共通",emp:"正社員",req:["技術的な課題をビジネス視点から捉え直し、社内関係者と円滑に合意形成を図れるコミュニケーション能力","外部業者に対する折衝・価格交渉・新規業者選定の実務経験","プロパティマネジメント会社・ビル管理会社または事業会社の総務・管財部門等での実務経験","建築設備に関する基礎知識、および内装工事・レイアウト管理の基礎知識"],url:"https://recruit.nhn-japan.com/recruits/japan/4322803608010911234"},
+  {corp:"JAPAN",grp:"Corporate",nm:"AI推進担当",sr:"Corporate 共通",emp:"正社員",req:["AIを活用した業務プロセスの整理および改善（As-Is / To-Be設計）の実務経験","ITツール・データ活用等を用いた業務改善を現場に定着させた経験","複数のステークホルダーを巻き込み、プロジェクトを推進した経験","下記いずれかを必須とする：Claudeを活用した業務改善の実務経験 ／ プロンプト設計・ワークフロー設計を自ら行っていること ／ スクリプト作成やツール連携等、自ら手を動かして業務改善を実装した経験"],url:"https://recruit.nhn-japan.com/recruits/japan/4300859859336538512"},
+  {corp:"JAPAN",grp:"Corporate",nm:"人事企画",sr:"人事・採用・労務",emp:"正社員",req:["人事企画または人事制度構築の経験（5年以上）","人材サービスまたはHRTech業界での勤務経験（2年以上）"],url:"https://recruit.nhn-japan.com/recruits/japan/4285876609540226015"},
+  {corp:"JAPAN",grp:"Corporate",nm:"採用担当",sr:"人事・採用・労務",emp:"正社員",req:["事業会社または人材会社における採用業務経験（3年以上）","社内外の関係者と円滑にコミュニケーションを取れる方"],url:"https://recruit.nhn-japan.com/recruits/japan/4285135526688758697"},
+  {corp:"JAPAN",grp:"Corporate",nm:"管理会計・財務分析担当",sr:"財務・会計・経理",emp:"正社員",req:["会計・財務業務の実務経験（目安：3年以上）","決算対応・予算管理・数値分析の経験","Excelを用いたデータ集計・分析スキル"],url:"https://recruit.nhn-japan.com/recruits/japan/4282093751865433133"},
+  {corp:"JAPAN",grp:"Corporate",nm:"法務",sr:"法務・監査",emp:"正社員",req:["事業会社での法務実務経験","コミュニケーションスキル（ビジネス部門と円滑に対話できる力）"],url:"https://recruit.nhn-japan.com/recruits/japan/4275675072469249562"},
+  {corp:"JAPAN",grp:"Corporate",nm:"美術館・宿泊施設スタッフ（COMICO ART MUSEUM YUFUIN）",sr:"Corporate 共通",emp:"正社員",req:["接客サービス業務にやりがいを持てる方","パソコンやスマートフォンの基本操作・知識のある方"],url:"https://recruit.nhn-japan.com/recruits/japan/3866051077139431844"},
+  {corp:"JAPAN",grp:"Corporate",nm:"経理（マネージャー候補）",sr:"財務・会計・経理",emp:"正社員",req:["財務・会計の実務経験5年以上（業界不問・企業の経理部門での経験は必須）","メイン担当として年次決算・会計監査・税務対応のご経験"],url:"https://recruit.nhn-japan.com/recruits/japan/3813370899540496665"},
+  // ── NHN Techorus ──
+  {corp:"Techorus",grp:"Business",nm:"新規事業企画",sr:"企画・運営",emp:"正社員",pin:true,req:["アプリ／ゲームビジネスの知見","プロジェクト推進経験","決済関連業務の経験","CSやサービス企画・運営経験","業務プロセス構築、改善経験","※事業やサービスの立ち上げを主体的に推進できる方"],url:""},
+  {corp:"Techorus",grp:"Tech",nm:"Google Workspaceエンジニア",sr:"インフラ",emp:"正社員",req:["Google Workspace の技術的実装・運用経験","Cloud Identity・Active Directory・LDAP 等のディレクトリサービス知識","トラブルシューティング・技術サポートスキル"],url:"https://recruit.nhn-japan.com/recruits/techorus/4337955306692494291"},
+  {corp:"Techorus",grp:"Tech",nm:"ネットワークエンジニア",sr:"インフラ",emp:"正社員",req:["ネットワーク運用経験","TCP/IPの基本理解","Cisco/Juniper製ルータ・スイッチの操作経験","BGP・OSPF・ISIS などダイナミックルーティングの基礎的な知識","Linuxの基本操作"],url:"https://recruit.nhn-japan.com/recruits/techorus/4334976465830646486"},
+  {corp:"Techorus",grp:"Tech",nm:"データ分析基盤エンジニア",sr:"バックエンド開発",emp:"正社員",req:["Python・Pandasを用いた本格的なデータ処理の実装経験","パフォーマンスを意識した大規模ETL処理システムの構築経験","保守性・拡張性を考慮したオブジェクト指向設計の実践経験","GitHubを用いたチーム開発の経験","保守性・可読性を重視したコーディング能力"],url:"https://recruit.nhn-japan.com/recruits/techorus/4241704299895124730"},
+  {corp:"Techorus",grp:"Tech",nm:"決済プラットフォーム開発エンジニア（新規事業）",sr:"バックエンド開発",emp:"正社員",req:["Javaによるアプリケーション開発経験（3年以上）","Spring Bootフレームワーク経験","チーム開発・コミュニケーション能力"],url:"https://recruit.nhn-japan.com/recruits/techorus/4199573187343000336"},
+  {corp:"Techorus",grp:"Tech",nm:"ソリューションアーキテクト",sr:"インフラ",emp:"正社員",req:["クラウド技術（AWS・Google Cloud等）の提案・活用経験、またはインフラ設計・構築経験のいずれかを2年以上","エンジニア・非エンジニアを問わず多様なステークホルダーとの折衝経験"],url:"https://recruit.nhn-japan.com/recruits/techorus/3813831512295426731"},
+  {corp:"Techorus",grp:"Tech",nm:"ソリューションアーキテクト（リーダー候補）",sr:"インフラ",emp:"正社員",req:["AWS Solutions Architect Professional（SAP）資格保持","AWS設計・構築経験3年以上","運用・保守経験3年以上（障害対応・トラブルシューティング・運用設計経験）","顧客との直接的な要件定義・提案経験","プロジェクトマネジメント経験"],url:"https://recruit.nhn-japan.com/recruits/techorus/4179127414081178776"},
+  {corp:"Techorus",grp:"Tech",nm:"プロジェクトマネージャー（PM/PL）",sr:"インフラ",emp:"正社員",req:["プロジェクトマネージャー・リーダーとして案件に参画した経験","AWS・Google Cloud いずれかの実務経験"],url:"https://recruit.nhn-japan.com/recruits/techorus/3974975512792365056"},
+  {corp:"Techorus",grp:"Tech",nm:"Google Workspaceコンサルタント",sr:"インフラ",emp:"正社員",req:["Google WorkspaceまたはSaaS（Microsoft 365等）の導入・運用コンサルティング経験","顧客の経営層や部門長に対する折衝・プレゼンテーションスキル","ITインフラやクラウドセキュリティの基礎知識"],url:"https://recruit.nhn-japan.com/recruits/techorus/4337955306692494292"},
+  {corp:"Techorus",grp:"Tech",nm:"ソリューションアーキテクト（CCoE）",sr:"インフラ",emp:"正社員",req:["パブリッククラウド（AWS/Google Cloud/OCI）の設計・構築・運用経験、またはCI/CDパイプラインの設計・構築経験、またはシステム監視の設計・運用・改善経験 のいずれかを保有","AWS Solution Architect Professional相当の知識"],url:"https://recruit.nhn-japan.com/recruits/techorus/4306269604960348271"},
+  {corp:"Techorus",grp:"Tech",nm:"データエンジニア",sr:"共通",emp:"正社員",req:["パブリッククラウド環境（AWSまたはGoogle Cloud）でのデータエンジニアリング経験2年以上","要件定義・設計・構築等の開発プロジェクト経験"],url:"https://recruit.nhn-japan.com/recruits/techorus/4017653257910517853"},
+  {corp:"Techorus",grp:"Business",nm:"事業推進",sr:"企画・運営",emp:"正社員",req:["クラウド・IT業界での業務経験","プロジェクトマネジメント経験","プロダクト企画・アライアンス業務経験"],url:"https://recruit.nhn-japan.com/recruits/techorus/4287363451654397157"},
+  {corp:"Techorus",grp:"Business",nm:"プロダクト企画",sr:"企画・運営",emp:"正社員",req:["AWS・Google Cloudなどのクラウドサービスに関する知見","SaaS製品の企画・QA経験","システム開発の実務経験","顧客視点での製品企画経験"],url:"https://recruit.nhn-japan.com/recruits/techorus/4256732296333760161"},
+  {corp:"Techorus",grp:"Business",nm:"事業企画（クラウド事業）",sr:"企画・運営",emp:"正社員",req:["クラウド・IT業界での業務経験","プロジェクトマネジメント経験","プロダクト企画・アライアンス業務経験"],url:"https://recruit.nhn-japan.com/recruits/techorus/3924790123884457502"},
+  {corp:"Techorus",grp:"Business",nm:"（契約社員）マーケティング・コンテンツ制作",sr:"マーケティング",emp:"契約社員",req:["制作・制作ディレクション経験2年以上","複数案件の同時進行管理経験","Adobe Illustrator・Figmaの実務経験","Adobe Photoshopの実務経験","出社での業務対応が可能"],url:"https://recruit.nhn-japan.com/recruits/techorus/4250983387744646374"},
+  {corp:"Techorus",grp:"Business",nm:"デジタルマーケティング（Web企画推進／AI活用）",sr:"マーケティング",emp:"正社員",req:["B2B領域でのデジタルマーケティング、またはWeb・コンテンツの企画・運用・ディレクション経験（2年以上）","計測設計・分析（GA4等）とデータに基づく改善経験（アクセス解析・CVR改善・レポート作成等）","関係者と合意形成しながら施策を推進した経験","生成AIを活用した業務改善に関心があり試行錯誤できる方"],url:"https://recruit.nhn-japan.com/recruits/techorus/4282316084437846150"},
+  {corp:"Techorus",grp:"Business",nm:"マーケティング・企画（新規事業「Forwardy」）",sr:"マーケティング",emp:"正社員",req:["BtoB向けマーケティング・企画・営業いずれかの経験","デジタルマーケティングの基礎理解","クラウド・ホスティング・WordPressへの関心・理解"],url:"https://recruit.nhn-japan.com/recruits/techorus/4144425715641072258"},
+  {corp:"Techorus",grp:"Business",nm:"ソリューションセールス",sr:"営業",emp:"正社員",req:["クラウド・IT業界での法人営業経験（2年以上）","クラウドMSPに関する基礎知識","技術への関心・チャレンジ精神"],url:"https://recruit.nhn-japan.com/recruits/techorus/3813907613836122928"},
+  {corp:"Techorus",grp:"Business",nm:"ソリューション営業（大阪オフィス）",sr:"営業",emp:"正社員",req:["AWS・Google Cloud等のパブリッククラウドサービスに関わる法人営業の経験（3年以上）","AWS・Google Cloud等のパブリッククラウドサービスにおける見積経験","提案書作成（PowerPoint）およびプレゼンテーションのご経験"],url:"https://recruit.nhn-japan.com/recruits/techorus/4148146645946040794"},
+  {corp:"Techorus",grp:"Business",nm:"ソリューション営業（管理職）",sr:"営業",emp:"正社員",req:["IT業界における法人営業経験10年以上","営業部門のマネジメント経験5年以上（部長またはそれに準ずる役職）","クラウドサービスに関する深い知識","経営戦略・事業計画の立案・実行経験"],url:"https://recruit.nhn-japan.com/recruits/techorus/3952479567149968317"},
+  {corp:"Techorus",grp:"Business",nm:"パートナーサクセス",sr:"営業",emp:"正社員",req:["IT業界でのソリューション営業経験もしくはコンサルティング経験（通算で3年以上）","パートナー営業経験・企業間のアライアンス構築経験"],url:"https://recruit.nhn-japan.com/recruits/techorus/4275741786380812110"},
+  {corp:"Techorus",grp:"Corporate",nm:"法務部門長（リーガルマネージャー）",sr:"法務・監査",emp:"正社員",req:["事業会社での法務実務経験（10年以上）","メンバーマネジメント経験（3年以上）","法的観点から事業実現のスキームを提案できる思考力"],url:"https://recruit.nhn-japan.com/recruits/techorus/4038815018425516857"},
+];
+
+const GFORM_BASE = 'https://docs.google.com/forms/d/e/1FAIpQLSfYVbB15q14TGlcZLCF_0TnJKB1kMd4VtZYFCw-8cMBj44f7w/viewform';
+
+const GRP_CLS   = {Tech:"b-tech", Business:"b-biz", Corporate:"b-corp", Design:"b-des"};
+const GRP_LABEL = {Tech:"Tech", Business:"Business", Corporate:"Corporate", Design:"Design"};
+const EMP_CLS   = {正社員:"b-seiin", 契約社員:"b-keiyak", 準社員:"b-jun"};
+
+function reqHtml(req) {
+  if (!req || req.length === 0) return '<span class="req-none">—</span>';
+  return '<div class="req-text"><ul>' + req.map(r => `<li>${r}</li>`).join('') + '</ul></div>';
+}
+
+function buildTable(rows) {
+  if (rows.length === 0) return '';
+  return `<div class="tbl-wrap"><table>
+    <colgroup><col class="c-grp"><col class="c-pos"><col class="c-emp"><col class="c-req"><col class="c-detail"></colgroup>
+    <thead><tr><th>職種</th><th>ポジション名 / 職種</th><th>雇用形態</th><th>必須要件</th><th style="text-align:center">詳細</th></tr></thead>
+    <tbody>
+      ${rows.map(d => {
+        const gc  = GRP_CLS[d.grp]  || 'b-etc';
+        const gl  = GRP_LABEL[d.grp] || d.grp;
+        const ec  = EMP_CLS[d.emp]   || 'b-seiin';
+        const detailBtn = d.url
+          ? `<a class="btn-detail" href="${d.url}" target="_blank" rel="noopener">求人詳細</a>`
+          : `<span class="btn-detail-none">—</span>`;
+        return `<tr data-corp="${d.corp}" data-grp="${d.grp}" data-emp="${d.emp}" data-nm="${d.nm}" data-req="${(d.req||[]).join(' ')}">
+          <td><span class="badge ${gc}">${gl}</span></td>
+          <td><div class="pos-name">${d.nm}</div><div class="pos-series">${d.sr}</div></td>
+          <td><span class="badge ${ec}">${d.emp}</span></td>
+          <td>${reqHtml(d.req)}</td>
+          <td class="detail-cell">${d.pin ? '<span class="btn-detail-private">外部未公開</span>' : detailBtn}</td>
+        </tr>`;
+      }).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+const GRP_ORDER = {Business:0, Corporate:1, Tech:2, Design:3};
+const EMP_ORDER = {正社員:0, 契約社員:1, 準社員:2};
+
+function sortData(data) {
+  return [...data].sort((a, b) => {
+    // pin:true는 항상 최상단
+    if (a.pin && !b.pin) return -1;
+    if (!a.pin && b.pin) return 1;
+    const go = (GRP_ORDER[a.grp] ?? 99) - (GRP_ORDER[b.grp] ?? 99);
+    if (go !== 0) return go;
+    const eo = (EMP_ORDER[a.emp] ?? 99) - (EMP_ORDER[b.emp] ?? 99);
+    if (eo !== 0) return eo;
+    return a.sr.localeCompare(b.sr, 'ja');
+  });
+}
+
+function buildSections(data) {
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  CORPS.forEach(corp => {
+    const rows = sortData(data.filter(d => d.corp === corp.id));
+    const sec = document.createElement('div');
+    sec.className = 'corp-section';
+    sec.dataset.corp = corp.id;
+    sec.innerHTML = `
+      <div class="corp-header">
+        <div class="corp-dot" style="background:${corp.dot}"></div>
+        <div class="corp-title">${corp.label}</div>
+        <div class="corp-count" id="count-${corp.id}">${rows.length}件</div>
+      </div>
+      ${buildTable(rows)}
+    `;
+    if (rows.length === 0) sec.classList.add('section-hidden');
+    main.appendChild(sec);
+  });
+}
+
+function filter() {
+  const vc = document.getElementById('fCorp').value;
+  const vg = document.getElementById('fGrp').value;
+  const ve = document.getElementById('fEmp').value;
+  const kw = document.getElementById('fKw').value.toLowerCase().trim();
+
+  let total = 0;
+
+  document.querySelectorAll('.corp-section').forEach(sec => {
+    const corpId = sec.dataset.corp;
+    if (vc && corpId !== vc) { sec.classList.add('section-hidden'); return; }
+
+    const rows = sec.querySelectorAll('tbody tr');
+    let visible = 0;
+    rows.forEach(tr => {
+      const grpOk = !vg || tr.dataset.grp === vg;
+      const empOk = !ve || tr.dataset.emp === ve;
+      const kwOk  = !kw || tr.dataset.nm.toLowerCase().includes(kw) || tr.dataset.req.toLowerCase().includes(kw);
+      if (grpOk && empOk && kwOk) {
+        tr.classList.remove('hidden');
+        visible++;
+      } else {
+        tr.classList.add('hidden');
+      }
+    });
+
+    const countEl = document.getElementById('count-' + corpId);
+    if (countEl) countEl.textContent = visible + '件';
+    sec.classList.toggle('section-hidden', visible === 0);
+    total += visible;
+  });
+
+  document.getElementById('cnt').textContent = total + '件';
+  document.getElementById('noResult').classList.toggle('hidden', total > 0);
+}
+
+// init
+buildSections(DATA);
+document.getElementById('cnt').textContent = DATA.length + '件';
+
+['fCorp','fGrp','fEmp'].forEach(id => document.getElementById(id).addEventListener('change', filter));
+document.getElementById('fKw').addEventListener('input', filter);
+</script>
+</body>
+</html>
